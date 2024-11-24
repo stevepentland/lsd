@@ -9,12 +9,16 @@
 <br>
 <br>
 <a href="https://www.warp.dev/?utm_source=github&utm_medium=referral&utm_campaign=lsd_20231001">
+<div>
+  <picture>
+    <img alt="Warp" width="300" src="https://github.com/user-attachments/assets/2bda420d-4211-4900-a37e-e3c7056d799c">
+  </picture>
+</div>
+  <b>Warp, the intelligent terminal</b>
   <div>
-    <img src="https://user-images.githubusercontent.com/3764335/271887540-b782d11d-d122-484d-8cd3-7fdff3b4ac4d.png" width="230" alt="Warp">
-  </div>
-  <b>Warp is a blazingly fast, Rust-based terminal reimagined to work like a modern app.</b>
-  <div>
-    <sup>Get more done in the CLI with real text editing, block-based output, and AI command search.</sup>
+    <sup>Available for MacOS and Linux<br>
+Visit warp.dev to learn more
+    </sup>
   </div>
 </a>
 <hr>
@@ -23,7 +27,7 @@
 **IMPORTANT**: This is the development documents,
 please check the docs in [Tags](https://github.com/lsd-rs/lsd/tags) if you installed from the released ones.
 
-The current newest release is: [v1.0.0](https://github.com/lsd-rs/lsd/tree/v1.0.0)
+The current newest release is: [v1.1.5](https://github.com/lsd-rs/lsd/tree/v1.1.5)
 
 ---
 
@@ -55,23 +59,23 @@ The project is heavily inspired by the super [colorls](https://github.com/athity
 Install the patched fonts of powerline nerd-font and/or font-awesome. Have a look at the [Nerd Font README](https://github.com/ryanoasis/nerd-fonts/blob/master/readme.md) for more installation instructions. Don't forget to setup your terminal in order to use the correct font.
 
 | OS/Distro                       | Command                                                              |
-| ------------------------------- | -------------------------------------------------------------------- |
-| Archlinux                       | `pacman -S lsd`                                                      |
-| Fedora                          | `dnf install lsd`                                                    |
-| Gentoo                          | `sudo emerge sys-apps/lsd`                                           |
-| macOS                           | `brew install lsd` or `sudo port install lsd`                        |
-| NixOS                           | `nix-env -iA nixos.lsd`                                              |
-| FreeBSD                         | `pkg install lsd`                                                    |
-| NetBSD or any `pkgsrc` platform | `pkgin install lsd` or `cd /usr/pkgsrc/sysutils/lsd && make install` |
-| OpenBSD                         | `pkg_add lsd`                                                        |
-| Windows                         | `scoop install lsd` or `winget install --id lsd-rs.lsd`              |
-| Android (via Termux)            | `pkg install lsd`                                                    |
-| Debian sid and bookworm         | `apt install lsd`                                                    |
-| Ubuntu 23.04 (Lunar Lobster)    | `apt install lsd`                                                    |
-| Earlier Ubuntu/Debian versions  | **snap discontinued**, use [From Binaries](#from-binaries)           |
-| Solus                           | `eopkg it lsd`                                                       |
-| Void Linux                      | `sudo xbps-install lsd`                                              |
-| openSUSE                        | `sudo zypper install lsd`                                            |
+| ------------------------------- | -------------------------------------------------------------------------------|
+| Archlinux                       | `pacman -S lsd`                                                                |
+| Fedora                          | `dnf install lsd`                                                              |
+| Gentoo                          | `sudo emerge sys-apps/lsd`                                                     |
+| macOS                           | `brew install lsd` or `sudo port install lsd`                                  |
+| NixOS                           | `nix-env -iA nixos.lsd`                                                        |
+| FreeBSD                         | `pkg install lsd`                                                              |
+| NetBSD or any `pkgsrc` platform | `pkgin install lsd` or `cd /usr/pkgsrc/sysutils/lsd && make install`           |
+| OpenBSD                         | `pkg_add lsd`                                                                  |
+| Windows                         | `scoop install lsd` or `winget install --id lsd-rs.lsd` or `choco install lsd` |
+| Android (via Termux)            | `pkg install lsd`                                                              |
+| Debian sid and bookworm         | `apt install lsd`                                                              |
+| Ubuntu 23.04 (Lunar Lobster)    | `apt install lsd`                                                              |
+| Earlier Ubuntu/Debian versions  | **snap discontinued**, use [From Binaries](#from-binaries)                     |
+| Solus                           | `eopkg it lsd`                                                                 |
+| Void Linux                      | `sudo xbps-install lsd`                                                        |
+| openSUSE                        | `sudo zypper install lsd`                                                      |
 
 ### From source
 
@@ -102,20 +106,25 @@ Check [Config file content](#config-file-content) for details.
 
 On non-Windows systems `lsd` follows the
 [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
-convention for the location of the configuration file. The configuration dir
-`lsd` uses is itself named `lsd`. In that directory it looks first for a file
-called `config.yaml`.
-For most people it should be enough to put their config file at
-`~/.config/lsd/config.yaml`.
+convention for the location of the configuration file. A `config.yaml` or `config.yml` file will be searched for in these locations, in order:
+
+- `$HOME/.config/lsd`
+- `$XDG_CONFIG_HOME/lsd`
+
+On most systems these are mapped to the same location, which is `~/.config/lsd/config.yaml`.
 
 ### Windows
 
-On Windows systems `lsd` only looks for the `config.yaml` files in one location:
-`%APPDATA%\lsd\`
+On Windows systems `lsd` searches for `config.yaml` or `config.yml` in the following locations, in order:
+
+- `%USERPROFILE%\.config\lsd`
+- `%APPDATA%\lsd`
+
+These are usually something like `C:\Users\username\AppData\Roaming\lsd\config.yaml` and `C:\Users\username\.config\lsd\config.yaml` respectively.
 
 ### Custom
 
-You can also provide a configuration file from a non standard location:
+You can also provide a configuration file from a non-standard location:
 `lsd --config-file [PATH]`
 
 ### Config file content
@@ -219,7 +228,7 @@ size: default
 
 # == Permission ==
 # Specify the format of the permission column
-# Possible value: rwx, octal, attributes (windows only), disabled
+# Possible value: rwx, octal, attributes (windows only), disable
 # permission: rwx
 
 # == Sorting ==
@@ -282,12 +291,12 @@ truncate-owner:
 
 ### Color Theme
 
-Color theme can be configured in the [configuration file](#configuration)(color.theme),
+Color theme can be configured in the [configuration file](#configuration)(color.theme).
 The valid theme configurations are:
 
 - `default`: the default color scheme shipped in `lsd`
 - `custom`: use a custom color scheme defined in `colors.yaml`
-- *(deprecated) theme_file_name(yaml): use the theme file to specify colors(without the `yaml` extension)*
+- *(deprecated) theme_file_name(yaml): use the theme file to specify colors (without the `yaml` extension)*
 
 When set to `custom`, `lsd` will look for `colors.yaml` in the
 XDG Base Directory, e.g. ~/.config/lsd/colors.yaml
@@ -354,10 +363,7 @@ git-status:
 ```
 
 When creating a theme for `lsd`, you can specify any part of the default theme,
-and then change its colors, the items missed would fallback to use the default colors.
-
-Please also notice that an empty theme is **NOT** supported due to
-[a bug in serde lib](https://github.com/dtolnay/serde-yaml/issues/86).
+and then change its colors, the items missed would fall back to use the default colors.
 
 ### Icon Theme
 
@@ -375,7 +381,7 @@ Check [Icon Theme file content](#icon-theme-file-content) for details.
 The final set of icons used will be a combination of what is shipped with in `lsd` with overrides from config applied on top of it.
 *You can find the default set of icons [here](src/theme/icon.rs).*
 
-Both nerd font glyphs and unicode emojis can be used for icons. You can find an example of icons customization below.
+Both nerd font glyphs and Unicode emojis can be used for icons. You can find an example of icons customization below.
 
 ```yaml
 name:
@@ -442,10 +448,10 @@ For `lsd` currently, it reads a system environment variable called LS_COLORS. Pl
 
 ### Icons not showing up
 
-For `lsd` to be able to display icons, the font has to include special font glyphs. This might not be the case for most fonts that you download. Thankfully, you can patch most fonts using [NerdFont](https://www.nerdfonts.com/) and add these icons. Or you can just download an already patched version of your favourite font from [NerdFont font download page](https://www.nerdfonts.com/font-downloads).
-Here is a guide on how to setup fonts on [macOS](https://github.com/lsd-rs/lsd/issues/199#issuecomment-494218334) and [Android](https://github.com/lsd-rs/lsd/issues/423).
+For `lsd` to be able to display icons, the font has to include special font glyphs. This might not be the case for most fonts that you download. Thankfully, you can patch most fonts using [NerdFont](https://www.nerdfonts.com/) and add these icons. Or you can just download an already patched version of your favorite font from [NerdFont font download page](https://www.nerdfonts.com/font-downloads).
+Here is a guide on how to set up fonts on [macOS](https://github.com/lsd-rs/lsd/issues/199#issuecomment-494218334) and [Android](https://github.com/lsd-rs/lsd/issues/423).
 
-To check if the font you are using is setup correctly, try running the following snippet in a shell and see if that [prints a folder icon](https://github.com/lsd-rs/lsd/issues/510#issuecomment-860000306). If it prints a box, or question mark or something else, then you might have some issues in how you setup the font or how your terminal emulator renders the font.
+To check if the font you are using is set up correctly, try running the following snippet in a shell and see if that [prints a folder icon](https://github.com/lsd-rs/lsd/issues/510#issuecomment-860000306). If it prints a box, or question mark or something else, then you might have some issues in how you set up the font or how your terminal emulator renders the font.
 
 ```sh
 echo $'\uf115'
@@ -453,7 +459,7 @@ echo $'\uf115'
 
 ### Icons missing or not rendering correctly using PuTTY/KiTTY on Windows
 
-First of all, make sure a patched font is installed and PuTTY/KiTTY is configurated to use it, please check [Prerequisites](#prerequisites).
+First of all, make sure a patched font is installed and PuTTY/KiTTY is configured to use it, please check [Prerequisites](#prerequisites).
 
 There are problems for PuTTY/KiTTY to show 2 char wide icons, make sure using a 1 char wide font like [Hack Regular Nerd Font Complete Mono Windows Compatible](https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Hack/Regular/complete/Hack%20Regular%20Nerd%20Font%20Complete%20Mono%20Windows%20Compatible.ttf), check [this issue](https://github.com/lsd-rs/lsd/issues/331) for detail.
 
@@ -472,18 +478,18 @@ The default colors are:
 |                                                                       | ![#d75f87](https://via.placeholder.com/15/d75f87/000000?text=+) No Access              | ![#00d7d7](https://via.placeholder.com/15/00d7d7/000000?text=+) Pipe/Symlink/Blockdevice/Socket/Special |                                                                                      |                                                                             |
 |                                                                       |                                                                                        | ![#d78700](https://via.placeholder.com/15/d78700/000000?text=+) CharDevice                              |                                                                                      |                                                                             |
 
-_Checkout [trapd00r/LS_COLORS](https://github.com/trapd00r/LS_COLORS) and [sharkdp/vivid](https://github.com/sharkdp/vivid) for help in themeing using `LS_COLORS`._
+_Checkout [trapd00r/LS_COLORS](https://github.com/trapd00r/LS_COLORS) and [sharkdp/vivid](https://github.com/sharkdp/vivid) for help in theming using `LS_COLORS`._
 
 ### First char of folder/file getting trimmed
 
-Workaround for Konsole: ㅤEdit the config file (or [create it](#config-file-location) if it doesn't already exist) and paste the following into it (contains invisible unicode characters):
+Workaround for Konsole: ㅤEdit the config file (or [create it](#config-file-location) if it doesn't already exist) and paste the following into it (contains invisible Unicode characters):
 
 ```yml
 icons:
     separator: " ㅤ"
 ```
 
-This is a known issue in a few terminal emulator. Try using a different terminal emulator like. [Alacritty](https://github.com/alacritty/alacritty) and [Kitty](https://github.com/kovidgoyal/kitty) are really good alternatives. You might also want to check if your font is responsible for causing this.
+This is a known issue in a few terminal emulators. Try using a different terminal emulator like. [Alacritty](https://github.com/alacritty/alacritty) and [Kitty](https://github.com/kovidgoyal/kitty) are really good alternatives. You might also want to check if your font is responsible for causing this.
 To verify this, try running lsd with icons disabled and if it still does not have the first character, then this is an lsd bug:
 
 ```sh
@@ -496,7 +502,7 @@ lsd --icon never --ignore-config
 
 ### Icons are showing up strangely
 
-Nerd Fonts is moving the codepoints of the Material Design Icons in 3.0, so lsd has updated the icons in #830. If your icons look weird, use fonts that have been patched using Nerd Fonts v2.3.0 or later.
+Nerd Fonts is moving the code points of the Material Design Icons in 3.0, so lsd has updated the icons in #830. If your icons look weird, use fonts that have been patched using Nerd Fonts v2.3.0 or later.
 
 See also: <https://github.com/ryanoasis/nerd-fonts/releases/tag/v2.3.3>
 

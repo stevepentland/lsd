@@ -17,9 +17,6 @@ use serde::Deserialize;
 use std::fs;
 use std::io;
 
-const CONF_DIR: &str = "lsd";
-const CONF_FILE_NAME: &str = "config.yaml";
-
 /// A struct to hold an optional configuration items, and provides methods
 /// around error handling in a config file.
 #[derive(Eq, PartialEq, Debug, Deserialize)]
@@ -80,6 +77,31 @@ pub struct Sorting {
 pub struct TruncateOwner {
     pub after: Option<usize>,
     pub marker: Option<String>,
+}
+
+/// This expand the `~` in path to HOME dir
+/// returns the origin one if no `~` found;
+/// returns None if error happened when getting home dir
+///
+/// Implementing this to reuse the `dirs` dependency, avoid adding new one
+pub fn expand_home<P: AsRef<Path>>(path: P) -> Option<PathBuf> {
+    let p = path.as_ref();
+    if !p.starts_with("~") {
+        return Some(p.to_path_buf());
+    }
+    if p == Path::new("~") {
+        return dirs::home_dir();
+    }
+    dirs::home_dir().map(|mut h| {
+        if h == Path::new("/") {
+            // Corner case: `h` root directory;
+            // don't prepend extra `/`, just drop the tilde.
+            p.strip_prefix("~").unwrap().to_path_buf()
+        } else {
+            h.push(p.strip_prefix("~/").unwrap());
+            h
+        }
+    })
 }
 
 impl Config {
@@ -144,61 +166,50 @@ impl Config {
         serde_yaml::from_str::<Self>(yaml)
     }
 
-    /// This provides the path for a configuration file, according to the XDG_BASE_DIRS specification.
-    /// return None if error like PermissionDenied
-    #[cfg(not(windows))]
-    pub fn config_file_path() -> Option<PathBuf> {
+    /// Config paths for non-Windows platforms will be read from
+    /// `$XDG_CONFIG_HOME/lsd` or `$HOME/.config/lsd`
+    /// (usually, those are the same) in that order.
+    /// The default paths for Windows will be read from
+    /// `%APPDATA%\lsd` or `%USERPROFILE%\.config\lsd` in that order.
+    /// This will apply both to the config file and the theme file.
+    pub fn config_paths() -> impl Iterator<Item = PathBuf> {
+        #[cfg(not(windows))]
         use xdg::BaseDirectories;
-        match BaseDirectories::with_prefix(CONF_DIR) {
-            Ok(p) => Some(p.get_config_home()),
-            Err(e) => {
-                print_error!("Can not open config file: {}.", e);
-                None
-            }
-        }
-    }
 
-    /// This provides the path for a configuration file, inside the %APPDATA% directory.
-    /// return None if error like PermissionDenied
-    #[cfg(windows)]
-    pub fn config_file_path() -> Option<PathBuf> {
-        dirs::config_dir().map(|x| x.join(CONF_DIR))
-    }
-
-    /// This expand the `~` in path to HOME dir
-    /// returns the origin one if no `~` found;
-    /// returns None if error happened when getting home dir
-    ///
-    /// Implementing this to reuse the `dirs` dependency, avoid adding new one
-    pub fn expand_home<P: AsRef<Path>>(path: P) -> Option<PathBuf> {
-        let p = path.as_ref();
-        if !p.starts_with("~") {
-            return Some(p.to_path_buf());
-        }
-        if p == Path::new("~") {
-            return dirs::home_dir();
-        }
-        dirs::home_dir().map(|mut h| {
-            if h == Path::new("/") {
-                // Corner case: `h` root directory;
-                // don't prepend extra `/`, just drop the tilde.
-                p.strip_prefix("~").unwrap().to_path_buf()
-            } else {
-                h.push(p.strip_prefix("~/").unwrap());
-                h
-            }
-        })
+        [
+            dirs::home_dir().map(|h| h.join(".config")),
+            dirs::config_dir(),
+            #[cfg(not(windows))]
+            BaseDirectories::with_prefix("")
+                .ok()
+                .map(|p| p.get_config_home()),
+        ]
+        .iter()
+        .filter_map(|p| p.as_ref().map(|p| p.join("lsd")))
+        .collect::<Vec<_>>()
+        .into_iter()
     }
 }
 
 impl Default for Config {
+    /// Try to find either config.yaml or config.yml in the config directories
+    /// and use the first one that is found. If none are found, or the parsing fails,
+    /// use the default from DEFAULT_CONFIG.
     fn default() -> Self {
-        if let Some(p) = Self::config_file_path() {
-            if let Some(c) = Self::from_file(p.join(CONF_FILE_NAME)) {
-                return c;
-            }
-        }
-        Self::from_yaml(DEFAULT_CONFIG).unwrap()
+        Config::config_paths()
+            .find_map(|p| {
+                let yaml = p.join("config.yaml");
+                let yml = p.join("config.yml");
+                if yaml.is_file() {
+                    Config::from_file(yaml)
+                } else if yml.is_file() {
+                    Config::from_file(yml)
+                } else {
+                    None
+                }
+            })
+            .or(Self::from_yaml(DEFAULT_CONFIG).ok())
+            .expect("Failed to read both config file and default config")
     }
 }
 
